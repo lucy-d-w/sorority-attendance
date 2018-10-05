@@ -35,7 +35,7 @@ C: “Depending on my stress level, I can attend 0 to 5 sorority events in a wee
 
 ## Do you ever not know where you need to be and when in regards to sorority activities? If yes, what do you do to resolve that?
 A: “Umm … yes. I don’t tend to figure out where to be and when until very close to when the event starts. I tend to look at the groupme or text a friend.”\
-B: “Omg all the time lucy these are such good questions. To resolve it, I unfortunately have to go find emails with chapter announcements. Mostly I just freak out and send it to groupme, which wastes everyone’s time. I just want a text that reminds me where I need to be. I don’t want to do it on calendar.” \
+B: “Oh my god all the time Lucy these are such good questions. To resolve it, I unfortunately have to go find emails with chapter announcements. Mostly I just freak out and send it to groupme, which wastes everyone’s time. I just want a text that reminds me where I need to be. I don’t want to do it on calendar.” \
 C: “I frequently get confused on what’s happening because we get like so many emails that it becomes numb. To resolve it, I usually rely on group message and other people talking about things.”
 
 ## What does your decision making process look like when you decide whether or not to attend an event?
