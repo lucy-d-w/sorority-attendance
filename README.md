@@ -93,6 +93,6 @@ After user testing, we will return to the drawing board and make improvements ba
 
 Please feel free to reach out if you need any additional guidance!
 
-Best,
+Best,\
 Lucy Wang
 
