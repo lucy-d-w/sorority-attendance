@@ -6,19 +6,12 @@
 
 
 ;; Do not edit!
-;; A def for the course home page URL.
+;; A def for the rules doc.
 (def guidelines-doc "https://docs.google.com/spreadsheets/d/1xYCZJDbWmdA2WrtAPEBv051OtFg-gY7B8KUqLRG-1nc/edit#gid=0")
 
 
 ;; Do not edit!
-;; A map specifying the instructor's office hours that is keyed by day of the week.
-; (def instructor-hours {"tuesday"  {:start    8
-;                                    :end      10
-;                                    :location "the chairs outside of the Wondry"}
-;
-;                        "thursday" {:start    8
-;                                    :end      10
-;                                    :location "the chairs outside of the Wondry"}})
+;; Maps specifying my calendar and the organization's calendar
 
   (def my-cal {"10/29" {:date "10/29"
                             :start 8
@@ -107,11 +100,9 @@
 
 ;; Asgn 1.
 ;;
-;; @Todo: Fill in this function to return the CS 4278 home page.
+;; @Todo: Fill in this function to return the guidelines doc.
 ;; Use the `guidelines-doc` def to produce the output.
 ;;
-;; See the guidelines-test in test/asgnx/core_test.clj for the
-;; complete specification.
 ;;
 (defn guidelines [_] guidelines-doc)
 
@@ -131,12 +122,7 @@
 ;; Asgn 1.
 ;;
 ;; @Todo: This function should take a map in the format of
-;; the values in the `instructor-hours` map (e.g. {:start ... :end ... :location ...})
-;; and convert it to a string format.
-;;
-;; Example:
-;; (formatted-hours {:start 8 :end 10 :location "the chairs outside of the Wondry"}))
-;; "from 8am to 10am in the chairs outside of the Wondry"
+;; the calendars and convert it to a string format.
 ;;
 ;; You should use your format-hour function to implement this.
 ;;
@@ -152,6 +138,7 @@
     " from "(format-hour (get hours :start)) " to " (format-hour (get hours :end))
     ". The deadline to submit an excuse is " (get hours :excuseDeadline) " and the fine is $" (get hours :fine) " if you skip without an excuse. "))
 
+;; Formats the excuse that is to be sent.
   (defn formatted-hours-excuse1 [hours]
       (str "Hi, I am so sorry, but I will not be able to attend " (get hours :event) " on "
       (get hours :date) ". "))
@@ -162,22 +149,12 @@
 
 ;; Asgn 1.
 ;;
-;; @Todo: This function should lookup and see if the instructor
-;; has office hours on the day specified by the first of the `args`
-;; in the parsed message. If so, the function should return the
-;; `formatted-hours` representation of the office hours. If not,
-;; the function should return "there are no office hours on that day".
-;; The office hours for the instructor should be obtained from the
-;; `instructor-hours` map.
+;; @Todo: This function should lookup and see if there are any personal or
+;; sorority events on the day specified by the first of the `args`
+;; in the parsed message. If so, the function should return a formatted
+;;  representation of the calendar. If not,
+;; the function should return "You/your sorority have/has no events on this day".
 ;;
-;; You should use your formatted-hours function to implement this.
-;;
-;; See the office-hours-for-day-test in test/asgnx/core_test.clj for the
-;; complete specification.
-;;
-; (defn office-hours [{:keys [args cmd]}]
-;   (if (or (= (get args 0) "thursday")(= "tuesday" (get args 0)))
-;   (formatted-hours (get instructor-hours (get args 0))) "there are no office hours on that day"))
 
 (defn my-events [{:keys [args cmd]}]
   (if (get my-cal(first args))
@@ -278,17 +255,8 @@
 ;; @Todo: Create a function called "exec-register"
 ;; that takes the current application `state`, a `topic`
 ;; the exec's `id` (e.g., unique name), and information
-;; about the exec (`info`) and registers them as an exec on
-;; the specified topic. Look at the associated test to see the
-;; expected function signature.
-;;
-;; Your function should NOT directly change the application state
-;; to register them but should instead return a list of the
-;; appropriate side-effects (above) to make the registration
-;; happen.
-;;
-;; See the integration test in See handle-message-test for the
-;; expectations on how your code operates
+;; about the exec (`info`) and registers them as an exec board member overseeing
+;; the specified topic.
 ;;
 (defn exec-register [exec topic id info] [(action-insert [:exec topic id] info)])
 
@@ -300,17 +268,11 @@
 ;; removes the exec from the list of exec on that topic.
 ;; Look at the associated test to see the expected function signature.
 ;;
-;; Your function should NOT directly change the application state
-;; to unregister them but should instead return a list of the
-;; appropriate side-effects (above) to make the registration
-;; happen.
-;;
-;; See the integration test in See handle-message-test for the
-;; expectations on how your code operates
 ;;
 (defn exec-unregister [exec topic id] [(action-remove [:exec topic id])])
 
-
+;; If the user chooses to submit an excuse, this will format the excuse with
+;; the event being missed and the reason why.
 (defn submit-excuse-msg [{:keys [args exec]}]
  (let [
    y (formatted-hours-excuse1 (get sorority-cal (first args)))
@@ -319,74 +281,30 @@
    (str "Submitting excuse to " (count exec) " exec member(s) for approval: \"" y z)
    ))
 
-
 ;; Asgn 3.
 ;;
-;; @Todo: Create a function called "ask-exec"
-;; that takes two parameters:
-;;
-;; 1. the list of exec on the topic
-;; 2. a parsed message with the format:
-;;    {:cmd "ask"
-;;     :user-id "phone number that sent the message"
-;;     :args [topic question-word1 question-word2 ... question-wordN]}
+;; @Todo: Create a function called "submit-excuse."
 ;;
 ;; The sender of the message will be identified by their phone number
 ;; in the user-id parameter. This is the phone number that you will need
-;; to forward answers to the question to.
+;; to forward decisions on whether or not they are excused from events to.
 ;;
-;; The parsed message is generated by breaking up the words in the ask
-;; text message. For example, if someone sent the message:
-;;
-;; "ask food what is the best pizza in nashville"
-;;
-;; The parsed message would be:
-;;
-;; {:cmd "ask"
-;;  :user-id "+15555555555"
-;;  :args ["food" "what" "is" "the" "best" "pizza" "in" "nashville"]}
-;;
-;; This function needs to return a list with two elements:
-;; [[actions...] "response to asker"]
+;; The excuse being sent is compiled from data in both calendars.
 ;;
 ;; The actions in the list are the *side effects* that need to take place
 ;; to ask the question (e.g., sending messages to the exec). The string
 ;; is the response that is going to be sent back to the person that asked
-;; the question (e.g. "Asking 2 exec(s) for an answer to ....").
+;; the question.
 ;;
 ;; The correct string response to a valid question should be produced with
 ;; the `exec-question-msg` function above.
 ;;
-;; Think about how you are going to figure out where to route messages
-;; when an exec answers (see the conversations query) and make sure you
-;; handle the needed side effect for storing the conversation state.
-;;
 ;; If there are no registered exec on a topic, you should return an
-;; empty list of actions and "There are no exec on that topic."
+;; empty list of actions and "This position does not exist"
 ;;
-;; If there isn't a question, you should return "You must ask a valid question."
+;; If there isn't a question, you should return "You must submit a valid excuse."
 ;;
-;; Why this strange architecture? By returning a list of the actions to take,
-;; rather than directly taking that action, we can keep this function pure.
-;; Pure functions are WAY easier to test / maintain. Also, we can isolate our
-;; messy impure action handling at the "edges" of the application, where it is
-;; easier to track and reason about.
 ;;
-;; You should look at `handle-message` to get an idea of the way that this
-;; function is going to be used, its expected signature, and how the actions
-;; and output are going to work.
-;;
-;; See the integration test in See handle-message-test for the
-;; expectations on how your code operates
-;;
-
-; (defn submit-excuse-msg [{:keys [exec args cmd]}]
-;  (let [
-;    y (formatted-hours-excuse1 (get sorority-cal (first args)))
-;    z (formatted-hours-excuse2 (get my-cal (first args)))
-;    ]
-;    (str "Submitting excuse to " (count exec) " exec member(s) for approval: \"" y z)
-;    ))
 
 
 (defn submit-excuse [exec {:keys [args user-id cmd]}]
@@ -395,15 +313,10 @@
   [(concat(action-send-msgs exec (string/join " " "-Lucy"))(action-inserts [:conversations] exec
   {:last-question (string/join " " (rest args)) :asker user-id}))(submit-excuse-msg {:args (rest args) :exec exec})])))
 
-    ; (defn ask-exec [exec {:keys [args user-id]}](if(empty? (rest args))
-    ; [[]"You must ask a valid question."](if (empty? exec)
-    ; [[]"There are no exec on that topic."][(concat(action-send-msgs exec
-    ;  (string/join " " (rest args)))(action-inserts [:conversations] exec
-    ;  {:last-question (string/join " " (rest args)) :asker user-id}))(submit-excuse-msg exec (rest args))])))
 
 ;; Asgn 3.
 ;;
-;; @Todo: Create a function called "answer-question"
+;; @Todo: Create a function called "approve-excuse"
 ;; that takes two parameters:
 ;;
 ;; 1. the last conversation describing the last question that was routed
@@ -478,20 +391,20 @@
 ;; The parsed message is generated by breaking up the words in the exec
 ;; text message. For example, if someone sent the message:
 ;;
-;; "exec food"
+;; "exec social"
 ;;
 ;; The parsed message would be:
 ;;
 ;; {:cmd "exec"
 ;;  :user-id "+15555555555"))
-;;  :args ["food"]}
+;;  :args ["social"]}
 ;;
-;; This function needs to add "sara" to the list of exec on "food" and
+;; This function needs to add "sara" to the list of exec overseeing "social" and
 ;; associate her phone number with her ID.
 ;;
-;; Similar to the function `ask-exec` function, this function needs to
+;; This function needs to
 ;; return the updated `state`, which should now have the exec registered
-;; under the specified topic (e.g., "sara" under "food"). The output to
+;; under the specified topic (e.g., "sara" under "social"). The output to
 ;; send back to the user should be (str exec-id " is now an exec on " topic)
 ;;
 ;; The last line of your function should be something like:
@@ -521,7 +434,7 @@
              "decide"   approve-excuse})
 ;; Asgn 3.
 ;;
-;; @Todo: Add mappings of the cmds "exec", "ask", and "answer" to
+;; @Todo: Add mappings of the cmds "exec", "submit", and "decide" to
 ;; to the `routes` map so that the functions that you
 ;; created will be invoked when the corresponding text message
 ;; commands are received.

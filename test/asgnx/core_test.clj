@@ -204,57 +204,58 @@
              (<!! (handle-message
                     system
                     "test-user"
-                    "ask food best burger in nashville"))))
-      (is (= "test-user is now registered as the exec member overseeing food."
+                    "submit random excuse"))))
+      (is (= "test-user is now registered as the exec member overseeing standards."
              (<!! (handle-message
                     system
                     "test-user"
-                    "exec food"))))
-      ; (is (= "Submitting excuse to 1 exec member(s) for approval: \"what burger\""
-      ;        (<!! (handle-message
-      ;               system
-      ;               "test-user"
-      ;               "ask food what burger"))))
-      ; (is (= "what burger"
-      ;        (<!! (pending-send-msgs system "test-user"))))
-      ; (is (= "test-user2 is now an exec on food."
-      ;        (<!! (handle-message
-      ;               system
-      ;               "test-user2"
-      ;               "exec food"))))
-      ; (is (= "Submitting excuse to 2 exec member(s) for approval: \"what burger\""
-      ;        (<!! (handle-message
-      ;               system
-      ;               "test-user"
-      ;               "ask food what burger"))))
-      ; (is (= "what burger"
-      ;        (<!! (pending-send-msgs system "test-user"))))
-      ; (is (= "what burger"
-      ;        (<!! (pending-send-msgs system "test-user2"))))
-      ; (is (= "You must submit a valid excuse."
-      ;        (<!! (handle-message
-      ;               system
-      ;               "test-user"
-      ;               "ask food "))))
-      (is (= "test-user is now registered as the exec member overseeing nashville."
+                    "exec standards"))))
+
+        (is (= "Submitting excuse to 1 exec member(s) for approval: \"Hi, I am so sorry, but I will not be able to attend Chapter on 10/29. The reason is that I have a(n) Interview at the same time. "
+               (<!! (handle-message
+                system
+                  "test-user"
+              "submit standards 10/29"))))
+      (is (= "- L u c y"
+             (<!! (pending-send-msgs system "test-user"))))
+      (is (= "test-user2 is now registered as the exec member overseeing standards."
+             (<!! (handle-message
+                    system
+                    "test-user2"
+                    "exec standards"))))
+      (is (= "Submitting excuse to 2 exec member(s) for approval: \"Hi, I am so sorry, but I will not be able to attend Chapter on 10/29. The reason is that I have a(n) Interview at the same time. "
              (<!! (handle-message
                     system
                     "test-user"
-                    "exec nashville"))))
-      ; (is (= "Submitting excuse to 1 exec member(s) for approval: \"what bus\""
-      ;        (<!! (handle-message
-      ;               system
-      ;               "test-user2"
-      ;               "ask nashville what bus"))))
-      ; (is (= "what bus"
-      ;        (<!! (pending-send-msgs system "test-user"))))
+                    "submit standards 10/29"))))
+      (is (= "- L u c y"
+             (<!! (pending-send-msgs system "test-user"))))
+      (is (= "- L u c y"
+             (<!! (pending-send-msgs system "test-user2"))))
+      (is (= "You must submit a valid excuse."
+             (<!! (handle-message
+                    system
+                    "test-user"
+                    "submit social "))))
+      (is (= "test-user is now registered as the exec member overseeing social."
+             (<!! (handle-message
+                    system
+                    "test-user"
+                    "exec social"))))
+      (is (= "Submitting excuse to 1 exec member(s) for approval: \"Hi, I am so sorry, but I will not be able to attend Chapter on 10/29. The reason is that I have a(n) Interview at the same time. "
+             (<!! (handle-message
+                    system
+                    "test-user2"
+                    "submit social 10/29"))))
+      (is (= "- L u c y"
+             (<!! (pending-send-msgs system "test-user"))))
       (is (= "Your decision was sent."
              (<!! (handle-message
                    system
                    "test-user"
                    "decide the blue bus"))))
-      ; (is (= "the blue bus"
-      ;        (<!! (pending-send-msgs system "test-user2"))))
+      (is (= "the blue bus"
+             (<!! (pending-send-msgs system "test-user2"))))
       (is (= "You did not provide an approval or rejection."
              (<!! (handle-message
                    system
