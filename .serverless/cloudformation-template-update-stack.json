@@ -113,7 +113,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/asgnx/dev/1540263726638-2018-10-23T03:02:06.638Z/asgnx.zip"
+          "S3Key": "serverless/asgnx/dev/1540289210170-2018-10-23T10:06:50.170Z/asgnx.zip"
         },
         "FunctionName": "asgnx-dev-handle-msg",
         "Handler": "index.asgnx_lambda_SLASH_receive_message",
@@ -138,14 +138,14 @@
         "IamRoleLambdaExecution"
       ]
     },
-    "HandleDashmsgLambdaVersionRCKLDqviCgUDppoIqSu3rlzOmOpDKh4kfO75H05aZQ": {
+    "HandleDashmsgLambdaVersionnDpZWXAeqXpaj7wkQSIizZ9KlsjKFsiQgARuJOMtlns": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "HandleDashmsgLambdaFunction"
         },
-        "CodeSha256": "hfEx0AHzcAiA+gPNW4mh7r9vyp45DVYf9qNh0mTSmq0="
+        "CodeSha256": "IGVtr8eP/OzBFRXnPldmtjY6mI4dTS1opwSnQRuxJFI="
       }
     },
     "ApiGatewayRestApi": {
@@ -260,7 +260,7 @@
         "MethodResponses": []
       }
     },
-    "ApiGatewayDeployment1540263726801": {
+    "ApiGatewayDeployment1540289210335": {
       "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
         "RestApiId": {
@@ -336,7 +336,7 @@
     "HandleDashmsgLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "HandleDashmsgLambdaVersionRCKLDqviCgUDppoIqSu3rlzOmOpDKh4kfO75H05aZQ"
+        "Ref": "HandleDashmsgLambdaVersionnDpZWXAeqXpaj7wkQSIizZ9KlsjKFsiQgARuJOMtlns"
       }
     },
     "ServiceEndpoint": {

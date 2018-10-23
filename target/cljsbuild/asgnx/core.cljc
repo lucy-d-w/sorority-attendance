@@ -42,7 +42,7 @@
                                   :start 20
                                   :end 23
                                   :event "Semi-formal Date Party"
-                                  :excuseDeadline "No excuse required."
+                                  :excuseDeadline "N/A"
                                   :fine 0}})
 
 
@@ -144,13 +144,20 @@
 ;; complete specification.
 ;;
 (defn formatted-hours-me [hours]
-  (str "On " (get hours :date) ", I have a(n) "
+  (str "On " (get hours :date) ", you have a(n) "
   (get hours :event) " from "(format-hour (get hours :start)) " to " (format-hour (get hours :end)) ". "))
 
 (defn formatted-hours-sorority [hours]
-    (str "On " (get hours :date) ", my sorority has " (get hours :event)
+    (str "On " (get hours :date) ", your sorority has " (get hours :event)
     " from "(format-hour (get hours :start)) " to " (format-hour (get hours :end))
-    ". The deadline to submit an excuse is " (get hours :excuseDeadline) " and the fine is $" (get hours :fine) " if I skip without an excuse. "))
+    ". The deadline to submit an excuse is " (get hours :excuseDeadline) " and the fine is $" (get hours :fine) " if you skip without an excuse. "))
+
+  (defn formatted-hours-excuse1 [hours]
+      (str "Hi, I am so sorry, but I will not be able to attend " (get hours :event) " on "
+      (get hours :date) ". "))
+
+    (defn formatted-hours-excuse2 [hours]
+        (str "The reason is that I have a(n) " (get hours :event) " at the same time. "))
 
 
 ;; Asgn 1.
@@ -175,15 +182,14 @@
 (defn my-events [{:keys [args cmd]}]
   (if (get my-cal(first args))
     (formatted-hours-me (get my-cal (first args)))
-    (str "I have no events on this day. ")))
+    (str "You have no events on this day. ")))
 
   (defn sorority-events [{:keys [args cmd]}]
     (if (get sorority-cal(first args))
     (formatted-hours-sorority (get sorority-cal (first args)))
-    (str "My sorority has no events on this day. ")))
+    (str "Your sorority has no events on this day. ")))
 
   (defn all-events [{:keys [args cmd]}]
-    ;(and (= args args)(= cmd cmd))
     (let [
       x (my-events {:args args :cmd cmd})
       y (sorority-events {:args args :cmd cmd})
@@ -269,10 +275,10 @@
 
 ;; Asgn 3.
 ;;
-;; @Todo: Create a function called "experts-register"
+;; @Todo: Create a function called "exec-register"
 ;; that takes the current application `state`, a `topic`
-;; the expert's `id` (e.g., unique name), and information
-;; about the expert (`info`) and registers them as an expert on
+;; the exec's `id` (e.g., unique name), and information
+;; about the exec (`info`) and registers them as an exec on
 ;; the specified topic. Look at the associated test to see the
 ;; expected function signature.
 ;;
@@ -284,14 +290,14 @@
 ;; See the integration test in See handle-message-test for the
 ;; expectations on how your code operates
 ;;
-(defn experts-register [experts topic id info] [(action-insert [:expert topic id] info)])
+(defn exec-register [exec topic id info] [(action-insert [:exec topic id] info)])
 
 ;; Asgn 3.
 ;;
-;; @Todo: Create a function called "experts-unregister"
+;; @Todo: Create a function called "exec-unregister"
 ;; that takes the current application `state`, a `topic`
-;; and the expert's `id` (e.g., unique name) and then
-;; removes the expert from the list of experts on that topic.
+;; and the exec's `id` (e.g., unique name) and then
+;; removes the exec from the list of exec on that topic.
 ;; Look at the associated test to see the expected function signature.
 ;;
 ;; Your function should NOT directly change the application state
@@ -302,18 +308,24 @@
 ;; See the integration test in See handle-message-test for the
 ;; expectations on how your code operates
 ;;
-(defn experts-unregister [experts topic id] [(action-remove [:expert topic id])])
+(defn exec-unregister [exec topic id] [(action-remove [:exec topic id])])
 
-(defn experts-question-msg [experts question-words]
-  (str "Asking " (count experts) " expert(s) for an answer to: \""
-       (string/join " " question-words) "\""))
+
+(defn submit-excuse-msg [{:keys [args exec]}]
+ (let [
+   y (formatted-hours-excuse1 (get sorority-cal (first args)))
+   z (formatted-hours-excuse2 (get my-cal (first args)))
+   ]
+   (str "Submitting excuse to " (count exec) " exec member(s) for approval: \"" y z)
+   ))
+
 
 ;; Asgn 3.
 ;;
-;; @Todo: Create a function called "ask-experts"
+;; @Todo: Create a function called "ask-exec"
 ;; that takes two parameters:
 ;;
-;; 1. the list of experts on the topic
+;; 1. the list of exec on the topic
 ;; 2. a parsed message with the format:
 ;;    {:cmd "ask"
 ;;     :user-id "phone number that sent the message"
@@ -338,19 +350,19 @@
 ;; [[actions...] "response to asker"]
 ;;
 ;; The actions in the list are the *side effects* that need to take place
-;; to ask the question (e.g., sending messages to the experts). The string
+;; to ask the question (e.g., sending messages to the exec). The string
 ;; is the response that is going to be sent back to the person that asked
-;; the question (e.g. "Asking 2 expert(s) for an answer to ....").
+;; the question (e.g. "Asking 2 exec(s) for an answer to ....").
 ;;
 ;; The correct string response to a valid question should be produced with
-;; the `experts-question-msg` function above.
+;; the `exec-question-msg` function above.
 ;;
 ;; Think about how you are going to figure out where to route messages
-;; when an expert answers (see the conversations query) and make sure you
+;; when an exec answers (see the conversations query) and make sure you
 ;; handle the needed side effect for storing the conversation state.
 ;;
-;; If there are no registered experts on a topic, you should return an
-;; empty list of actions and "There are no experts on that topic."
+;; If there are no registered exec on a topic, you should return an
+;; empty list of actions and "There are no exec on that topic."
 ;;
 ;; If there isn't a question, you should return "You must ask a valid question."
 ;;
@@ -367,11 +379,27 @@
 ;; See the integration test in See handle-message-test for the
 ;; expectations on how your code operates
 ;;
-(defn ask-experts [experts {:keys [args user-id]}](if(empty? (rest args))
-[[]"You must ask a valid question."](if (empty? experts)
-[[]"There are no experts on that topic."][(concat(action-send-msgs experts
-  (string/join " " (rest args)))(action-inserts [:conversations] experts
-    {:last-question (string/join " " (rest args)) :asker user-id}))(experts-question-msg experts (rest args))])))
+
+; (defn submit-excuse-msg [{:keys [exec args cmd]}]
+;  (let [
+;    y (formatted-hours-excuse1 (get sorority-cal (first args)))
+;    z (formatted-hours-excuse2 (get my-cal (first args)))
+;    ]
+;    (str "Submitting excuse to " (count exec) " exec member(s) for approval: \"" y z)
+;    ))
+
+
+(defn submit-excuse [exec {:keys [args user-id cmd]}]
+  (if(empty? (rest args))[[]"You must submit a valid excuse."]
+  (if (empty? exec)[[]"This position does not exist."]
+  [(concat(action-send-msgs exec (string/join " " "-Lucy"))(action-inserts [:conversations] exec
+  {:last-question (string/join " " (rest args)) :asker user-id}))(submit-excuse-msg {:args (rest args) :exec exec})])))
+
+    ; (defn ask-exec [exec {:keys [args user-id]}](if(empty? (rest args))
+    ; [[]"You must ask a valid question."](if (empty? exec)
+    ; [[]"There are no exec on that topic."][(concat(action-send-msgs exec
+    ;  (string/join " " (rest args)))(action-inserts [:conversations] exec
+    ;  {:last-question (string/join " " (rest args)) :asker user-id}))(submit-excuse-msg exec (rest args))])))
 
 ;; Asgn 3.
 ;;
@@ -379,7 +407,7 @@
 ;; that takes two parameters:
 ;;
 ;; 1. the last conversation describing the last question that was routed
-;;    to the expert
+;;    to the exec
 ;; 2. a parsed message with the format:
 ;;    {:cmd "ask"
 ;;     :user-id "+15555555555"
@@ -391,8 +419,8 @@
 ;; "answer joey's house of pizza"
 ;;
 ;; The conversation will be data that you store as a side-effect in
-;; ask-experts. You probably want this data to be information about the
-;; last question asked to each expert. See the "think about" comment above.
+;; ask-exec. You probably want this data to be information about the
+;; last question asked to each exec. See the "think about" comment above.
 ;;
 ;; The parsed message would be:
 ;;
@@ -401,19 +429,19 @@
 ;;  :args ["joey's" "house" "of" "pizza"]}
 ;;
 ;; This function needs to return a list with two elements:
-;; [[actions...] "response to expert answering"]
+;; [[actions...] "response to exec answering"]
 ;;
 ;; The actions in the list are the *side effects* that need to take place
 ;; to send the answer to the original question asker. The string
-;; is the response that is going to be sent back to the expert answering
+;; is the response that is going to be sent back to the exec answering
 ;; the question.
 ;;
 ;; Think about how you are going to figure out where to route messages
-;; when an expert answers (see the conversations query) and make sure you
+;; when an exec answers (see the conversations query) and make sure you
 ;; handle the needed side effect for storing the conversation state.
 ;;
-;; If there are no registered experts on a topic, you should return an
-;; empty list of actions and "There are no experts on that topic."
+;; If there are no registered exec on a topic, you should return an
+;; empty list of actions and "There are no exec on that topic."
 ;;
 ;; If there isn't a question, you should return "You must ask a valid question."
 ;;
@@ -430,51 +458,51 @@
 ;; See the integration test in See handle-message-test for the
 ;; expectations on how your code operates
 ;;
-(defn answer-question [conversation {:keys
-  [args]}](if(empty? args) [[] "You did not provide an answer."]
-  (if (empty? conversation) [[]"You haven't been asked a question."]
-  [[(action-send-msg (get conversation :asker) (string/join " " args))]"Your answer was sent."])))
+(defn approve-excuse [conversation {:keys
+  [args]}](if(empty? args) [[] "You did not provide an approval or rejection."]
+  (if (empty? conversation) [[]"You haven't been asked to review an excuse."]
+  [[(action-send-msg (get conversation :asker) (string/join " " args))]"Your decision was sent."])))
 
 ;; Asgn 3.
 ;;
-;; @Todo: Create a function called "add-expert"
+;; @Todo: Create a function called "add-exec"
 ;; that takes two parameters:
 ;;
-;; 1. the current list of experts on the topic
+;; 1. the current list of exec on the topic
 ;; 2. a parsed message with the format:
-;;    {:cmd "expert"
+;;    {:cmd "exec"
 ;;     :user-id "+15555555555"
 ;;     :args [topic]
 ;;
 ;;
-;; The parsed message is generated by breaking up the words in the expert
+;; The parsed message is generated by breaking up the words in the exec
 ;; text message. For example, if someone sent the message:
 ;;
-;; "expert food"
+;; "exec food"
 ;;
 ;; The parsed message would be:
 ;;
-;; {:cmd "expert"
+;; {:cmd "exec"
 ;;  :user-id "+15555555555"))
 ;;  :args ["food"]}
 ;;
-;; This function needs to add "sara" to the list of experts on "food" and
+;; This function needs to add "sara" to the list of exec on "food" and
 ;; associate her phone number with her ID.
 ;;
-;; Similar to the function `ask-experts` function, this function needs to
-;; return the updated `state`, which should now have the expert registered
+;; Similar to the function `ask-exec` function, this function needs to
+;; return the updated `state`, which should now have the exec registered
 ;; under the specified topic (e.g., "sara" under "food"). The output to
-;; send back to the user should be (str expert-id " is now an expert on " topic)
+;; send back to the user should be (str exec-id " is now an exec on " topic)
 ;;
 ;; The last line of your function should be something like:
 ;;
-;; [new-state (str expert-id " is now an expert on " topic)]
+;; [new-state (str exec-id " is now an exec on " topic)]
 ;;
 ;; See the integration test in See handle-message-test for the
 ;; expectations on how your code operates
 ;;
-(defn add-expert [experts {:keys [args user-id]}]
-  [(experts-register experts (first args) user-id (rest args))(str user-id " is now an expert on " (first args) ".")])
+(defn add-exec [exec {:keys [args user-id]}]
+  [(exec-register exec (first args) user-id (rest args))(str user-id " is now registered as the exec member overseeing " (first args) ".")])
 
 ;; Don't edit!
 (defn stateless [f]
@@ -488,12 +516,12 @@
              "my"   (stateless my-events)
              "sorority"   (stateless sorority-events)
              "all"   (stateless all-events)
-             "expert"   add-expert
-             "ask"      ask-experts
-             "answer"   answer-question})
+             "exec"   add-exec
+             "submit"      submit-excuse
+             "decide"   approve-excuse})
 ;; Asgn 3.
 ;;
-;; @Todo: Add mappings of the cmds "expert", "ask", and "answer" to
+;; @Todo: Add mappings of the cmds "exec", "ask", and "answer" to
 ;; to the `routes` map so that the functions that you
 ;; created will be invoked when the corresponding text message
 ;; commands are received.
@@ -501,9 +529,9 @@
 
 
 ;; Don't edit!
-(defn experts-on-topic-query [state-mgr pmsg]
+(defn exec-on-topic-query [state-mgr pmsg]
   (let [[topic]  (:args pmsg)]
-    (list! state-mgr [:expert topic])))
+    (list! state-mgr [:exec topic])))
 
 
 ;; Don't edit!
@@ -514,9 +542,9 @@
 
 ;; Don't edit!
 (def queries
-  {"expert" experts-on-topic-query
-   "ask"    experts-on-topic-query
-   "answer" conversations-for-user-query})
+  {"exec" exec-on-topic-query
+   "submit"    exec-on-topic-query
+   "decide" conversations-for-user-query})
 
 
 ;; Don't edit!
@@ -593,7 +621,7 @@
        function to handle the message
     2. Parse the message
     3. Load any saved state that is going to be needed to process
-       the message (e.g., querying the list of experts, etc.)
+       the message (e.g., querying the list of exec, etc.)
     4. Find the function that can handle the message
     5. Call the handler function with the state from #3 and
        the message

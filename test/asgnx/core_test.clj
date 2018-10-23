@@ -200,68 +200,68 @@
           smgr   (kvstore/create state)
           system {:state-mgr smgr
                   :effect-handlers ehdlrs}]
-      (is (= "There are no experts on that topic."
+      (is (= "This position does not exist."
              (<!! (handle-message
                     system
                     "test-user"
                     "ask food best burger in nashville"))))
-      (is (= "test-user is now an expert on food."
+      (is (= "test-user is now registered as the exec member overseeing food."
              (<!! (handle-message
                     system
                     "test-user"
-                    "expert food"))))
-      (is (= "Asking 1 expert(s) for an answer to: \"what burger\""
+                    "exec food"))))
+      ; (is (= "Submitting excuse to 1 exec member(s) for approval: \"what burger\""
+      ;        (<!! (handle-message
+      ;               system
+      ;               "test-user"
+      ;               "ask food what burger"))))
+      ; (is (= "what burger"
+      ;        (<!! (pending-send-msgs system "test-user"))))
+      ; (is (= "test-user2 is now an exec on food."
+      ;        (<!! (handle-message
+      ;               system
+      ;               "test-user2"
+      ;               "exec food"))))
+      ; (is (= "Submitting excuse to 2 exec member(s) for approval: \"what burger\""
+      ;        (<!! (handle-message
+      ;               system
+      ;               "test-user"
+      ;               "ask food what burger"))))
+      ; (is (= "what burger"
+      ;        (<!! (pending-send-msgs system "test-user"))))
+      ; (is (= "what burger"
+      ;        (<!! (pending-send-msgs system "test-user2"))))
+      ; (is (= "You must submit a valid excuse."
+      ;        (<!! (handle-message
+      ;               system
+      ;               "test-user"
+      ;               "ask food "))))
+      (is (= "test-user is now registered as the exec member overseeing nashville."
              (<!! (handle-message
                     system
                     "test-user"
-                    "ask food what burger"))))
-      (is (= "what burger"
-             (<!! (pending-send-msgs system "test-user"))))
-      (is (= "test-user2 is now an expert on food."
-             (<!! (handle-message
-                    system
-                    "test-user2"
-                    "expert food"))))
-      (is (= "Asking 2 expert(s) for an answer to: \"what burger\""
-             (<!! (handle-message
-                    system
-                    "test-user"
-                    "ask food what burger"))))
-      (is (= "what burger"
-             (<!! (pending-send-msgs system "test-user"))))
-      (is (= "what burger"
-             (<!! (pending-send-msgs system "test-user2"))))
-      (is (= "You must ask a valid question."
-             (<!! (handle-message
-                    system
-                    "test-user"
-                    "ask food "))))
-      (is (= "test-user is now an expert on nashville."
-             (<!! (handle-message
-                    system
-                    "test-user"
-                    "expert nashville"))))
-      (is (= "Asking 1 expert(s) for an answer to: \"what bus\""
-             (<!! (handle-message
-                    system
-                    "test-user2"
-                    "ask nashville what bus"))))
-      (is (= "what bus"
-             (<!! (pending-send-msgs system "test-user"))))
-      (is (= "Your answer was sent."
+                    "exec nashville"))))
+      ; (is (= "Submitting excuse to 1 exec member(s) for approval: \"what bus\""
+      ;        (<!! (handle-message
+      ;               system
+      ;               "test-user2"
+      ;               "ask nashville what bus"))))
+      ; (is (= "what bus"
+      ;        (<!! (pending-send-msgs system "test-user"))))
+      (is (= "Your decision was sent."
              (<!! (handle-message
                    system
                    "test-user"
-                   "answer the blue bus"))))
-      (is (= "the blue bus"
-             (<!! (pending-send-msgs system "test-user2"))))
-      (is (= "You did not provide an answer."
+                   "decide the blue bus"))))
+      ; (is (= "the blue bus"
+      ;        (<!! (pending-send-msgs system "test-user2"))))
+      (is (= "You did not provide an approval or rejection."
              (<!! (handle-message
                    system
                    "test-user"
-                   "answer"))))
-      (is (= "You haven't been asked a question."
+                   "decide"))))
+      (is (= "You haven't been asked to review an excuse."
              (<!! (handle-message
                    system
                    "test-user3"
-                   "answer the blue bus")))))))
+                   "decide the blue bus")))))))
