@@ -1,0 +1,1 @@
+{:output-dir "target/cljsbuild", :externs ["closure-js/externs"], :optimizations :none, :output-to "target/cljsbuild/lambda.js", :output-wrapper false, :source-map true, :libs ["closure-js/libs"], :target :nodejs, :main "asgnx.lambda", :language-in :ecmascript5}

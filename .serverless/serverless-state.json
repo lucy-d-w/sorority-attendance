@@ -1,0 +1,468 @@
+{
+  "service": {
+    "service": "asgnx",
+    "serviceObject": {
+      "name": "asgnx"
+    },
+    "provider": {
+      "stage": "dev",
+      "region": "us-east-1",
+      "variableSyntax": "\\${([ ~:a-zA-Z0-9._'\",\\-\\/\\(\\)]+?)}",
+      "name": "aws",
+      "runtime": "nodejs4.3",
+      "memorySize": 3008,
+      "iamRoleStatements": [
+        {
+          "Effect": "Allow",
+          "Action": [
+            "s3:PutObject",
+            "s3:GetObject",
+            "s3:DeleteObject"
+          ],
+          "Resource": "arn:aws:s3:::cs4278-asgnx-state-wangld/*"
+        },
+        {
+          "Effect": "Allow",
+          "Action": [
+            "s3:ListBucket"
+          ],
+          "Resource": "arn:aws:s3:::cs4278-asgnx-state-wangld"
+        },
+        {
+          "Effect": "Allow",
+          "Action": "ssm:GetParameters",
+          "Resource": "*"
+        }
+      ],
+      "environmentSecrets": {
+        "twiliosid": "twilio-prod-account-sid",
+        "twiliotoken": "twilio-prod-token"
+      },
+      "versionFunctions": true,
+      "remoteFunctionData": null,
+      "compiledCloudFormationTemplate": {
+        "AWSTemplateFormatVersion": "2010-09-09",
+        "Description": "The AWS CloudFormation template for this Serverless application",
+        "Resources": {
+          "ServerlessDeploymentBucket": {
+            "Type": "AWS::S3::Bucket"
+          },
+          "HandleDashmsgLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/asgnx-dev-handle-msg"
+            }
+          },
+          "IamRoleLambdaExecution": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+              "AssumeRolePolicyDocument": {
+                "Version": "2012-10-17",
+                "Statement": [
+                  {
+                    "Effect": "Allow",
+                    "Principal": {
+                      "Service": [
+                        "lambda.amazonaws.com"
+                      ]
+                    },
+                    "Action": [
+                      "sts:AssumeRole"
+                    ]
+                  }
+                ]
+              },
+              "Policies": [
+                {
+                  "PolicyName": {
+                    "Fn::Join": [
+                      "-",
+                      [
+                        "dev",
+                        "asgnx",
+                        "lambda"
+                      ]
+                    ]
+                  },
+                  "PolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                      {
+                        "Effect": "Allow",
+                        "Action": [
+                          "logs:CreateLogStream"
+                        ],
+                        "Resource": [
+                          {
+                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/asgnx-dev-handle-msg:*"
+                          }
+                        ]
+                      },
+                      {
+                        "Effect": "Allow",
+                        "Action": [
+                          "logs:PutLogEvents"
+                        ],
+                        "Resource": [
+                          {
+                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/asgnx-dev-handle-msg:*:*"
+                          }
+                        ]
+                      },
+                      {
+                        "$ref": "$[\"service\"][\"provider\"][\"iamRoleStatements\"][0]"
+                      },
+                      {
+                        "$ref": "$[\"service\"][\"provider\"][\"iamRoleStatements\"][1]"
+                      },
+                      {
+                        "$ref": "$[\"service\"][\"provider\"][\"iamRoleStatements\"][2]"
+                      }
+                    ]
+                  }
+                }
+              ],
+              "Path": "/",
+              "RoleName": {
+                "Fn::Join": [
+                  "-",
+                  [
+                    "asgnx",
+                    "dev",
+                    "us-east-1",
+                    "lambdaRole"
+                  ]
+                ]
+              }
+            }
+          },
+          "HandleDashmsgLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": {
+                  "Ref": "ServerlessDeploymentBucket"
+                },
+                "S3Key": "serverless/asgnx/dev/1540263726638-2018-10-23T03:02:06.638Z/asgnx.zip"
+              },
+              "FunctionName": "asgnx-dev-handle-msg",
+              "Handler": "index.asgnx_lambda_SLASH_receive_message",
+              "MemorySize": 3008,
+              "Role": {
+                "Fn::GetAtt": [
+                  "IamRoleLambdaExecution",
+                  "Arn"
+                ]
+              },
+              "Runtime": "nodejs4.3",
+              "Timeout": 6,
+              "Environment": {
+                "Variables": {
+                  "twiliosid": "twilio-prod-account-sid",
+                  "twiliotoken": "twilio-prod-token"
+                }
+              }
+            },
+            "DependsOn": [
+              "HandleDashmsgLogGroup",
+              "IamRoleLambdaExecution"
+            ]
+          },
+          "HandleDashmsgLambdaVersionRCKLDqviCgUDppoIqSu3rlzOmOpDKh4kfO75H05aZQ": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "HandleDashmsgLambdaFunction"
+              },
+              "CodeSha256": "hfEx0AHzcAiA+gPNW4mh7r9vyp45DVYf9qNh0mTSmq0="
+            }
+          },
+          "ApiGatewayRestApi": {
+            "Type": "AWS::ApiGateway::RestApi",
+            "Properties": {
+              "Name": "dev-asgnx",
+              "EndpointConfiguration": {
+                "Types": [
+                  "EDGE"
+                ]
+              }
+            }
+          },
+          "ApiGatewayResourceMsg": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+              "ParentId": {
+                "Fn::GetAtt": [
+                  "ApiGatewayRestApi",
+                  "RootResourceId"
+                ]
+              },
+              "PathPart": "msg",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayMethodMsgGet": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "HttpMethod": "GET",
+              "RequestParameters": {},
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceMsg"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "ApiKeyRequired": false,
+              "AuthorizationType": "NONE",
+              "Integration": {
+                "IntegrationHttpMethod": "POST",
+                "Type": "AWS_PROXY",
+                "Uri": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":apigateway:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":lambda:path/2015-03-31/functions/",
+                      {
+                        "Fn::GetAtt": [
+                          "HandleDashmsgLambdaFunction",
+                          "Arn"
+                        ]
+                      },
+                      "/invocations"
+                    ]
+                  ]
+                }
+              },
+              "MethodResponses": []
+            }
+          },
+          "ApiGatewayMethodMsgPost": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "HttpMethod": "POST",
+              "RequestParameters": {},
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceMsg"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "ApiKeyRequired": false,
+              "AuthorizationType": "NONE",
+              "Integration": {
+                "IntegrationHttpMethod": "POST",
+                "Type": "AWS_PROXY",
+                "Uri": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":apigateway:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":lambda:path/2015-03-31/functions/",
+                      {
+                        "Fn::GetAtt": [
+                          "HandleDashmsgLambdaFunction",
+                          "Arn"
+                        ]
+                      },
+                      "/invocations"
+                    ]
+                  ]
+                }
+              },
+              "MethodResponses": []
+            }
+          },
+          "ApiGatewayDeployment1540263726801": {
+            "Type": "AWS::ApiGateway::Deployment",
+            "Properties": {
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "StageName": "dev"
+            },
+            "DependsOn": [
+              "ApiGatewayMethodMsgGet",
+              "ApiGatewayMethodMsgPost"
+            ]
+          },
+          "HandleDashmsgLambdaPermissionApiGateway": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "HandleDashmsgLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "apigateway.",
+                    {
+                      "Ref": "AWS::URLSuffix"
+                    }
+                  ]
+                ]
+              },
+              "SourceArn": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":execute-api:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":",
+                    {
+                      "Ref": "ApiGatewayRestApi"
+                    },
+                    "/*/*"
+                  ]
+                ]
+              }
+            }
+          },
+          "StateBucket": {
+            "Type": "AWS::S3::Bucket",
+            "Properties": {
+              "BucketName": "cs4278-asgnx-state-wangld"
+            }
+          }
+        },
+        "Outputs": {
+          "ServerlessDeploymentBucketName": {
+            "Value": {
+              "Ref": "ServerlessDeploymentBucket"
+            }
+          },
+          "HandleDashmsgLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "HandleDashmsgLambdaVersionRCKLDqviCgUDppoIqSu3rlzOmOpDKh4kfO75H05aZQ"
+            }
+          },
+          "ServiceEndpoint": {
+            "Description": "URL of the service endpoint",
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  "https://",
+                  {
+                    "Ref": "ApiGatewayRestApi"
+                  },
+                  ".execute-api.us-east-1.",
+                  {
+                    "Ref": "AWS::URLSuffix"
+                  },
+                  "/dev"
+                ]
+              ]
+            }
+          }
+        }
+      },
+      "coreCloudFormationTemplate": {
+        "AWSTemplateFormatVersion": "2010-09-09",
+        "Description": "The AWS CloudFormation template for this Serverless application",
+        "Resources": {
+          "ServerlessDeploymentBucket": {
+            "Type": "AWS::S3::Bucket"
+          }
+        },
+        "Outputs": {
+          "ServerlessDeploymentBucketName": {
+            "Value": {
+              "Ref": "ServerlessDeploymentBucket"
+            }
+          }
+        }
+      },
+      "vpc": {}
+    },
+    "plugins": [
+      "serverless-cljs-plugin",
+      "serverless-secrets"
+    ],
+    "pluginsData": {},
+    "functions": {
+      "handle-msg": {
+        "cljs": "asgnx.lambda/receive-message",
+        "events": [
+          {
+            "http": {
+              "path": "msg",
+              "method": "get",
+              "integration": "AWS_PROXY"
+            }
+          },
+          {
+            "http": {
+              "path": "msg",
+              "method": "post",
+              "integration": "AWS_PROXY"
+            }
+          }
+        ],
+        "handler": "index.asgnx_lambda_SLASH_receive_message",
+        "package": {
+          "artifact": "/Users/lucywang/Documents/SoftwareEngineering/sorority-attendance/.serverless/asgnx.zip"
+        },
+        "name": "asgnx-dev-handle-msg",
+        "environment": {
+          "twiliosid": "twilio-prod-account-sid",
+          "twiliotoken": "twilio-prod-token"
+        },
+        "memory": 3008,
+        "timeout": 6,
+        "runtime": "nodejs4.3",
+        "vpc": {}
+      }
+    },
+    "resources": {
+      "Resources": {
+        "StateBucket": {
+          "Type": "AWS::S3::Bucket",
+          "Properties": {
+            "BucketName": "cs4278-asgnx-state-wangld"
+          }
+        }
+      },
+      "Outputs": {}
+    },
+    "__cljsBasePath": "/Users/lucywang/Documents/SoftwareEngineering/sorority-attendance/.serverless/asgnx",
+    "__cljsArtifact": "/Users/lucywang/Documents/SoftwareEngineering/sorority-attendance/.serverless/asgnx.zip"
+  },
+  "package": {
+    "artifactDirectoryName": "serverless/asgnx/dev/1540263726638-2018-10-23T03:02:06.638Z",
+    "artifact": ""
+  }
+}

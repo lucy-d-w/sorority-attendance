@@ -1,0 +1,43 @@
+service: asgnx
+
+provider:
+  name: aws
+  runtime: nodejs4.3
+  memorySize: 3008
+  iamRoleStatements:
+    -  Effect: "Allow"
+       Action:
+         - "s3:PutObject"
+         - "s3:GetObject"
+         - "s3:DeleteObject"
+       Resource: "arn:aws:s3:::cs4278-asgnx-state-wangld/*"
+    -  Effect: "Allow"
+       Action:
+         - "s3:ListBucket"
+       Resource: "arn:aws:s3:::cs4278-asgnx-state-wangld"
+
+  environmentSecrets:
+    twiliosid: 'twilio-prod-account-sid'
+    twiliotoken: 'twilio-prod-token'
+
+resources:
+  Resources:
+    StateBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: cs4278-asgnx-state-wangld
+
+functions:
+  handle-msg:
+    cljs: asgnx.lambda/receive-message
+    events:
+      - http:
+          path: msg
+          method: get
+      - http:
+          path: msg
+          method: post
+
+plugins:
+  - serverless-cljs-plugin
+  - serverless-secrets
